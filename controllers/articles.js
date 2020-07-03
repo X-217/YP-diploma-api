@@ -2,7 +2,7 @@ const Article = require('../models/article');
 const { NotFound, Forbidden } = require('../errors/http-errors');
 const {
   articleNotFound, articleRemoved, removeArticleForbidden,
-} = require('../messages/messages.json');
+} = require('../messages/messages_ru.json');
 
 const getAllSavedArticles = (req, res, next) => {
   Article.find({ owner: req.user._id })

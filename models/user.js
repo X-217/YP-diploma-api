@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const uniqueValidator = require('mongoose-unique-validator');
 
-const messages = require('../messages/messages.json');
+const messages = require('../messages/messages_ru.json');
 
 const userSchema = new mongoose.Schema({
   name: {

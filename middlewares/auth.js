@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const messages = require('../messages/messages.json');
+const messages = require('../messages/messages_ru.json');
 const JWT_SECRET = require('../config');
 
 const { Unauthorized } = require('../errors/http-errors');

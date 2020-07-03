@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const errors = require('../messages/messages.json');
+const errors = require('../messages/messages_ru.json');
 
 const articleSchema = new mongoose.Schema({
   keyword: {

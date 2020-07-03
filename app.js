@@ -3,11 +3,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+//const { errors } = require('celebrate');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler.js');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { Forbidden } = require('./errors/http-errors');
-const messages = require('./messages/messages.json');
+const messages = require('./messages/messages_ru.json');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,7 @@ app.use(requestLogger);
 app.use(routes);
 app.all('*', () => { throw new Forbidden(messages.forbidden); });
 app.use(errorLogger);
+//app.use(errors());
 app.use(errorHandler);
 
 startDatabase()

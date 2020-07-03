@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
 const {
   authorizationComplete, authorizationFailed, userIsRegistered, userNotFound, emailNotUnique,
-} = require('../messages/messages.json');
+} = require('../messages/messages_ru.json');
 const User = require('../models/user.js');
 const { NotFound, Unauthorized, Conflict } = require('../errors/http-errors');
 
@@ -15,33 +15,24 @@ const getAuthorizedUser = (req, res, next) => {
     .catch(next);
 };
 
-/* const createUser = (req, res, next) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-
   hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
     .then(() => res.status(201).send({ message: userIsRegistered }))
     .catch(next);
-}; */
-
-const createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-  User.findOne({ email })
-    .then((user) => { console.log(user); })
-    .catch(next);
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email }).select('+password')
+  User.findOne({ email }).select('+password _id')
     .orFail(() => { throw new Unauthorized(authorizationFailed); })
     .then((user) => {
+      console.log(user);
       compare(password, user.password)
         .then((matched) => {
           if (!matched) { throw new Unauthorized(authorizationFailed); }
@@ -60,17 +51,21 @@ const login = (req, res, next) => {
 
 const checkUserExist = (req, res, next) => {
   const { email } = req.body;
-  User.findOne({ email })
-    .then(() => {
-      throw new Conflict(emailNotUnique);
+
+  User.findOne({ email }).select('-_id email')
+    .then((user) => {
+      if(user !== null) {
+        throw new Conflict(emailNotUnique);
+      }
+      next();
     })
-    .catch();
-  next();
+    .catch(next);
+
 };
 
 module.exports = {
   getAuthorizedUser,
-  //  checkUserExist,
+  checkUserExist,
   createUser,
   login,
 };
