@@ -9,7 +9,7 @@ const User = require('../models/user.js');
 const { NotFound, Unauthorized, Conflict } = require('../errors/http-errors');
 
 const getAuthorizedUser = (req, res, next) => {
-  User.findById(req.user._id).select('name email')
+  User.findById(req.user._id).select('-_id name email')
     .orFail(() => { throw new NotFound(userNotFound); })
     .then((user) => res.status(200).send(user))
     .catch(next);
@@ -32,7 +32,6 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password _id')
     .orFail(() => { throw new Unauthorized(authorizationFailed); })
     .then((user) => {
-      console.log(user);
       compare(password, user.password)
         .then((matched) => {
           if (!matched) { throw new Unauthorized(authorizationFailed); }
@@ -60,7 +59,6 @@ const checkUserExist = (req, res, next) => {
       next();
     })
     .catch(next);
-
 };
 
 module.exports = {

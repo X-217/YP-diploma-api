@@ -3,7 +3,8 @@ const validator = require('validator');
 const {
   dateRequired, emailNotValid, emailRequired, imageRequired, keywordRequired, linkRequired,
   nameMaxlength, nameMinlength, nameNoSpaces, nameRequired, passwordMinlength, passwordRequired,
-  sourceRequired, textRequired, titleRequired
+  sourceRequired, textRequired, titleRequired, keywordNoSpaces, titleNoSpaces, sourceNoSpaces,
+  textNoSpaces, dateNotValid, linkIsNotUrl, imageIsNotUrl, articleIdIsNotValid,
 } = require('../messages/messages_ru.json');
 
 const url = (link) => {
@@ -16,51 +17,68 @@ const url = (link) => {
 const validateArticle = celebrate({
   body: Joi.object().keys({
     keyword: Joi.string().required()
+      .regex(/\S/)
       .messages({
         'any.required': keywordRequired,
         'string.empty': keywordRequired,
+        'string.pattern.base': keywordNoSpaces,
       }),
     title: Joi.string().required()
+      .regex(/\S/)
       .messages({
         'any.required': titleRequired,
         'string.empty': titleRequired,
+        'string.pattern.base': titleNoSpaces,
       }),
     text: Joi.string().required()
+      .regex(/\S/)
       .messages({
         'any.required': textRequired,
         'string.empty': textRequired,
+        'string.pattern.base': textNoSpaces,
       }),
     date: Joi.date().required()
       .messages({
         'any.required': dateRequired,
-        'string.empty': dateRequired,
+        'date.base': dateNotValid,
       }),
     source: Joi.string().required()
+      .regex(/\S/)
       .messages({
         'any.required': sourceRequired,
         'string.empty': sourceRequired,
+        'string.pattern.base': sourceNoSpaces,
       }),
-    link: Joi.string().required().custom(url)
+    link: Joi.string().required()
+      .custom(url)
       .messages({
         'any.required': linkRequired,
         'string.empty': linkRequired,
+        'any.custom' : linkIsNotUrl,
       }),
-    image: Joi.string().required().custom(url)
+    image: Joi.string().required()
+      .custom(url)
       .messages({
         'any.required': imageRequired,
         'string.empty': imageRequired,
+        'any.custom' : imageIsNotUrl,
       }),
-    _id: Joi.string().alphanum().length(24),
-    /*      .messages({
-        'any.required': messages.idRequired,
-        'string.empty': messages.idRequired,
-      }), */
+    /*    _id: Joi.string().alphanum().length(24),
+            .messages({
+            'any.required': messages.idRequired,
+            'string.empty': messages.idRequired,
+          }), */
   }).unknown(true),
 });
 
 const validateArticleId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().alphanum().length(24),
+    articleId: Joi.string().alphanum().length(24)
+      .messages({
+        'string.length': articleIdIsNotValid,
+        'string.empty': articleIdIsNotValid,
+        'string.alphanum': articleIdIsNotValid,
+      }),
   }),
 });
 
@@ -74,7 +92,6 @@ const validateUser = celebrate({
         'string.max': nameMaxlength,
         'string.empty': nameRequired,
         'string.pattern.base': nameNoSpaces,
-//        'string.base': nameRequired,
       }),
     email: Joi.string().required().email()
       .messages({
@@ -106,6 +123,8 @@ const validateAuthentication = celebrate({ // корявое имя
       }),
   }),
 });
+
+
 
 module.exports = {
   validateArticle,

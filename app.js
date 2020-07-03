@@ -1,9 +1,9 @@
 const express = require('express');
-
+const helmet = require("helmet");
+const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-//const { errors } = require('celebrate');
 const routes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler.js');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -29,13 +29,19 @@ const startDatabase = async () => {
 
   }
 };
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+});
+
+app.use(helmet());
+app.use(limiter);
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(requestLogger);
 app.use(routes);
 app.all('*', () => { throw new Forbidden(messages.forbidden); });
 app.use(errorLogger);
-//app.use(errors());
 app.use(errorHandler);
 
 startDatabase()

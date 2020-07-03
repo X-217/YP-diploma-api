@@ -1,7 +1,7 @@
 const Article = require('../models/article');
-const { NotFound, Forbidden } = require('../errors/http-errors');
+const { NotFound, Forbidden, Conflict } = require('../errors/http-errors');
 const {
-  articleNotFound, articleRemoved, removeArticleForbidden,
+  articleNotFound, articleRemoved, removeArticleForbidden, articleIsSaved, articleNotUnique,
 } = require('../messages/messages_ru.json');
 
 const getAllSavedArticles = (req, res, next) => {
@@ -18,16 +18,18 @@ const createArticle = (req, res, next) => {
   Article.create({
     keyword, title, text, date, source, link, image, owner,
   })
-    .then((article) => res.status(200).send(article))
+    .then(() => res.status(200).send({ message: articleIsSaved }))
     .catch(next);
 };
 
 const removeArticleByID = (req, res, next) => {
-  Article.findOne({ _id: req.params.cardId })
+  console.log(req.params.articleId);
+  Article.findOne({ _id: req.params.articleId }).select('+owner')
     .orFail(() => { throw new NotFound(articleNotFound); })
     .then((article) => {
+      console.log(article);
       if (req.user._id === article.owner.toString()) {
-        Article.findOneAndDelete({ _id: req.params.cardId })
+        Article.findOneAndDelete({ _id: req.params.articleId })
           .then(() => res.status(200).send({ message: articleRemoved }))
           .catch(next);
       } else {
@@ -37,8 +39,23 @@ const removeArticleByID = (req, res, next) => {
     .catch(next);
 };
 
+const checkArticleExist = (req, res, next) => {
+  const {
+    keyword, title, text, date, source, link, image,
+  } = req.body;
+  Article.findOne({ keyword, title, text, date, source, link, image })
+    .then((article) => {
+      if(article !== null) {
+        throw new Conflict(articleNotUnique);
+      }
+      next();
+    })
+    .catch(next);
+};
+
 module.exports = {
   createArticle,
   getAllSavedArticles,
   removeArticleByID,
+  checkArticleExist,
 };
