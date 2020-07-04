@@ -38,9 +38,16 @@
     ],
     "node/prefer-promises/dns": "error",
     "node/prefer-promises/fs": "error",
-    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
-    "import/no-dynamic-require" : "off",
-    "no-param-reassign" : "off",
-    "no-shadow" : "off"
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": [
+          "_id"
+        ]
+      }
+    ],
+    "import/no-dynamic-require": "off",
+    "no-param-reassign": "off",
+    "no-shadow": "off"
   }
 }

@@ -2,15 +2,18 @@ const router = require('express').Router();
 
 const users = require('./users');
 const articles = require('./articles');
+const authentications = require('./authentication');
 
-const { checkUserExist, createUser, login } = require('../controllers/users');
-const { auth } = require('../middlewares/auth');
-const { validateUser, validateAuthentication } = require('../middlewares/validations');
+const {auth} = require('../middlewares/auth');
+const {Forbidden} = require('../errors/http-errors');
+const {forbiddenMsg} = require('../messages/messages_ru.json');
 
-router.post('/signup', checkUserExist, validateUser, createUser);
-router.post('/signin', validateAuthentication, login);
+router.use('/', authentications);
 router.use(auth);
 router.use('/users', users);
 router.use('/articles', articles);
+router.all('*', () => {
+    throw new Forbidden(forbiddenMsg);
+});
 
 module.exports = router;

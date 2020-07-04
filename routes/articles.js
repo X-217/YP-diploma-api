@@ -1,14 +1,11 @@
 const router = require('express').Router();
 
+const {validateArticle, validateArticleId} = require('../middlewares/validations');
 const {
-  validateArticle,
-  validateArticleId,
-} = require('../middlewares/validations');
-const {
-  getAllSavedArticles,
-  removeArticleByID,
-  createArticle,
-  checkArticleExist,
+    getAllSavedArticles,
+    removeArticleByID,
+    createArticle,
+    checkArticleExist,
 } = require('../controllers/articles.js');
 
 router.post('/', validateArticle, checkArticleExist, createArticle);
